@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class GameResult extends Model
 {
-    //
+    protected $fillable = ['user_id', 'score', 'time_taken_seconds'];
+
+    // Define relationship back to the User model
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
