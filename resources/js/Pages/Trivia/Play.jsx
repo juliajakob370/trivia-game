@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
 export default function Play({ auth, questions }) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState({});
     const [secondsRemaining, setSecondsRemaining] = useState(60); // 60s total round timer
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const { data, setData, post, processing, errors, transform } = useForm({
+        answers: {},
+        time_taken: 0,
+    });
     const currentQuestion = questions[currentIndex];
     const isLastQuestion = currentIndex === questions.length - 1;
 
@@ -27,21 +28,21 @@ export default function Play({ auth, questions }) {
 
     // Record option choice for current question
     const handleSelectOption = (optionKey) => {
-        setSelectedAnswers((prev) => ({
-            ...prev,
+        setData('answers', {
+            ...data.answers,
             [currentQuestion.id]: optionKey,
-        }));
+        });
     };
 
-    // Submit answers payload to TriviaController@store
     const handleSubmit = () => {
-        if (isSubmitting) return;
-        setIsSubmitting(true);
+        if (processing) return;
 
-        router.post(route('trivia.submit'), {
-            answers: selectedAnswers,
+        transform((data) => ({
+            ...data,
             time_taken: 60 - secondsRemaining,
-        });
+        }));
+
+        post(route('trivia.submit'));
     };
 
     return (
@@ -75,7 +76,7 @@ export default function Play({ auth, questions }) {
                             {['A', 'B', 'C', 'D'].map((letter) => {
                                 const optionKey = letter;
                                 const optionValue = currentQuestion[`option_${letter.toLowerCase()}`];
-                                const isSelected = selectedAnswers[currentQuestion.id] === optionKey;
+                                const isSelected = data.answers[currentQuestion.id] === optionKey;
 
                                 return (
                                     <button
@@ -106,10 +107,10 @@ export default function Play({ auth, questions }) {
                             {isLastQuestion ? (
                                 <button
                                     onClick={handleSubmit}
-                                    disabled={isSubmitting}
+                                    disabled={processing}
                                     className="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition"
                                 >
-                                    {isSubmitting ? 'Submitting...' : 'Finish & Submit 🚀'}
+                                    {processing ? 'Submitting...' : 'Finish & Submit 🚀'}
                                 </button>
                             ) : (
                                 <button
@@ -120,6 +121,7 @@ export default function Play({ auth, questions }) {
                                 </button>
                             )}
                         </div>
+                        {errors.answers && <p className="text-red-600 text-sm mt-2">{errors.answers}</p>}
 
                     </div>
                 </div>

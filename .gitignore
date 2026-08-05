@@ -12,6 +12,7 @@
 /resources/js/wayfinder
 /vendor
 .DS_Store
+/.teach
 .env
 .env.backup
 .env.production
