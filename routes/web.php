@@ -15,15 +15,15 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Named "dashboard" for Breeze's auth-flow redirects (see ADR 0003), but
+// renders Home — the category picker — not a stats dashboard.
+Route::get('/dashboard', [TriviaController::class, 'home'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/play', [TriviaController::class, 'index'])->name('trivia.play');
+    Route::get('/play/{category}', [TriviaController::class, 'index'])->name('trivia.play');
     Route::post('/submit-game', [TriviaController::class, 'store'])->name('trivia.submit');
     Route::get('/leaderboard', [TriviaController::class, 'leaderboard'])->name('trivia.leaderboard');
 });

@@ -2,87 +2,93 @@ import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-export default function Leaderboard({ auth, leaderboard }) {
+export default function Leaderboard({ leaderboard }) {
     const { flash } = usePage().props;
 
     return (
         <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Global Leaderboard</h2>}
+            header={
+                <h2 className="font-pixel text-sm text-plum-dark sm:text-base">
+                    Leaderboard
+                </h2>
+            }
         >
             <Head title="Leaderboard" />
 
-            <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+                {flash?.success && (
+                    <div className="mb-6 rounded border-l-4 border-plum bg-rose-light p-4 font-retro text-lg text-plum-dark shadow-sm">
+                        🎉 {flash.success}
+                    </div>
+                )}
 
-                    {/* Success Flash Banner */}
-                    {flash?.success && (
-                        <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 font-semibold rounded shadow-sm">
-                            🎉 {flash.success}
-                        </div>
-                    )}
+                <div className="overflow-hidden rounded-lg border-4 border-plum-dark bg-blush p-6 shadow-md">
+                    <div className="mb-6 flex items-center justify-between">
+                        <h3 className="font-pixel text-lg text-plum-dark">
+                            Top Players
+                        </h3>
+                        <Link
+                            href={route('dashboard')}
+                            className="rounded-md border-2 border-plum-dark bg-rose px-5 py-2 font-retro text-lg text-plum-dark transition hover:bg-rose-dark"
+                        >
+                            Play Again 🔄
+                        </Link>
+                    </div>
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold text-gray-900">Top 10 Players</h3>
-                            <Link
-                                href="/play"
-                                className="px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition"
-                            >
-                                Play Again 🔄
-                            </Link>
-                        </div>
-
-                        {/* Leaderboard Table */}
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                <tr className="border-b bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead>
+                                <tr className="border-b-2 border-rose bg-rose-light font-retro text-sm uppercase tracking-wider text-mauve">
                                     <th className="p-3">Rank</th>
                                     <th className="p-3">Player</th>
-                                    <th className="p-3">Score</th>
-                                    <th className="p-3">Time</th>
-                                    <th className="p-3">Date</th>
+                                    <th className="p-3">Total Score</th>
+                                    <th className="p-3">Avg. Time</th>
                                 </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+                            </thead>
+                            <tbody className="divide-y divide-rose font-retro text-lg text-plum-dark">
                                 {leaderboard && leaderboard.length > 0 ? (
-                                    leaderboard.map((item, index) => {
+                                    leaderboard.map((entry, index) => {
                                         const isTopThree = index < 3;
                                         const rankBadges = ['🥇', '🥈', '🥉'];
 
                                         return (
-                                            <tr key={item.id} className="hover:bg-gray-50 transition">
-                                                <td className="p-3 font-bold">
-                                                    {isTopThree ? rankBadges[index] : `#${index + 1}`}
+                                            <tr
+                                                key={entry.id}
+                                                className="transition hover:bg-rose-light"
+                                            >
+                                                <td className="p-3 font-pixel text-xs">
+                                                    {isTopThree
+                                                        ? rankBadges[index]
+                                                        : `#${index + 1}`}
                                                 </td>
-                                                <td className="p-3 font-semibold text-gray-900">
-                                                    {item.user ? item.user.name : 'Unknown Player'}
+                                                <td className="p-3">
+                                                    {entry.name}
                                                 </td>
-                                                <td className="p-3 font-bold text-indigo-600">
-                                                    {item.score} pts
+                                                <td className="p-3 font-bold text-plum">
+                                                    {entry.total_score} pts
                                                 </td>
-                                                <td className="p-3 text-gray-500">
-                                                    {item.time_taken_seconds}s
-                                                </td>
-                                                <td className="p-3 text-gray-400 text-xs">
-                                                    {new Date(item.created_at).toLocaleDateString()}
+                                                <td className="p-3 text-mauve">
+                                                    {Number(
+                                                        entry.average_time_seconds,
+                                                    ).toFixed(1)}
+                                                    s
                                                 </td>
                                             </tr>
                                         );
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="p-6 text-center text-gray-500">
-                                            No scores recorded yet. Be the first to play!
+                                        <td
+                                            colSpan="4"
+                                            className="p-6 text-center text-mauve"
+                                        >
+                                            No scores recorded yet. Be the
+                                            first to play!
                                         </td>
                                     </tr>
                                 )}
-                                </tbody>
-                            </table>
-                        </div>
-
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

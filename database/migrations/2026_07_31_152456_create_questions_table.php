@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('option_c');
             $table->string('option_d');
             $table->string('correct_option'); // 'A', 'B', 'C', or 'D'
-            $table->string('category')->default('General'); // category
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

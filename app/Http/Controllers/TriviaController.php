@@ -2,26 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Question;
 use App\Models\GameResult;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 
 class TriviaController extends Controller
 {
+    private const QUESTIONS_PER_GAME = 10;
+    private const POINTS_PER_CORRECT_ANSWER = 10;
+    private const MIX_SLUG = 'mix';
+
+    /**
+     * Home: the category picker.
+     */
+    public function home()
+    {
+        $categories = Category::orderBy('sort_order')
+            ->get(['id', 'name', 'slug', 'accent_color', 'icon']);
+
+        return Inertia::render('Home', [
+            'categories' => $categories,
+        ]);
+    }
+
     /**
      * 1. Start a New Game Round
      */
-    public function index()
+    public function index(string $categorySlug)
     {
-        // Fetch 5 random questions
-        $questions = Question::inRandomOrder()
-            ->take(5)
-            ->get(['id', 'question_text', 'option_a', 'option_b', 'option_c', 'option_d']); // leave out the answer to prevent cheating
+        if ($categorySlug === self::MIX_SLUG) {
+            $categoryName = 'Mix';
+            $questionsQuery = Question::query();
+        } else {
+            $categoryModel = Category::where('slug', $categorySlug)->firstOrFail();
+            $categoryName = $categoryModel->name;
+            $questionsQuery = Question::where('category_id', $categoryModel->id);
+        }
+
+        // Leave out the answer to prevent cheating.
+        $questions = $questionsQuery
+            ->inRandomOrder()
+            ->take(self::QUESTIONS_PER_GAME)
+            ->get(['id', 'question_text', 'option_a', 'option_b', 'option_c', 'option_d']);
 
         return Inertia::render('Trivia/Play', [
-            'questions' => $questions
+            'questions' => $questions,
+            'category' => $categoryName,
         ]);
     }
 
@@ -30,30 +60,28 @@ class TriviaController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate payload sent from React
         $validated = $request->validate([
             'answers' => 'required|array',
+            'answers.*' => 'nullable|string|in:A,B,C,D',
             'time_taken' => 'required|integer|min:0',
         ]);
 
         $userAnswers = $validated['answers'];
         $timeTaken = $validated['time_taken'];
 
-        // Retrieve the actual correct options from the DB for the submitted question IDs
         $questionIds = array_keys($userAnswers);
         $questions = Question::whereIn('id', $questionIds)->get()->keyBy('id');
 
         $score = 0;
 
         foreach ($userAnswers as $questionId => $submittedOption) {
-            if (isset($questions[$questionId])) {
-                if ($questions[$questionId]->correct_option === strtoupper($submittedOption)) {
-                    $score += 20; // 5 questions * 20 pts = 100 max points
+            if ($submittedOption && isset($questions[$questionId])) {
+                if ($questions[$questionId]->correct_option === $submittedOption) {
+                    $score += self::POINTS_PER_CORRECT_ANSWER;
                 }
             }
         }
 
-        // Save result to DB
         GameResult::create([
             'user_id' => Auth::id(),
             'score' => $score,
@@ -65,17 +93,26 @@ class TriviaController extends Controller
 
     /**
      * 3. View Global Leaderboard
+     *
+     * Ranked by a player's Total Score summed across every Game they've
+     * played, tie-broken by their average time per Game (faster wins).
+     * Computed live from game_results rather than stored — see ADR 0002.
      */
     public function leaderboard()
     {
-        $leaderboard = GameResult::with('user:id,name')
-            ->orderByDesc('score')
-            ->orderBy('time_taken_seconds', 'asc') // Faster time wins ties
+        $leaderboard = User::query()
+            ->select('users.id', 'users.name')
+            ->selectRaw('SUM(game_results.score) as total_score')
+            ->selectRaw('AVG(game_results.time_taken_seconds) as average_time_seconds')
+            ->join('game_results', 'game_results.user_id', '=', 'users.id')
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('total_score')
+            ->orderBy('average_time_seconds')
             ->take(10)
             ->get();
 
         return Inertia::render('Trivia/Leaderboard', [
-            'leaderboard' => $leaderboard
+            'leaderboard' => $leaderboard,
         ]);
     }
 }
