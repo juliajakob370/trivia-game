@@ -43,11 +43,14 @@ class TriviaController extends Controller
             $questionsQuery = Question::where('category_id', $categoryModel->id);
         }
 
-        // Leave out the answer to prevent cheating.
+        // correct_option is included so the client can show instant right/wrong
+        // feedback (shake + sound) on each answer; the timer makes hunting
+        // through dev tools for it not worth the lost time. Scoring is still
+        // computed server-side in store() regardless.
         $questions = $questionsQuery
             ->inRandomOrder()
             ->take(self::QUESTIONS_PER_GAME)
-            ->get(['id', 'question_text', 'option_a', 'option_b', 'option_c', 'option_d']);
+            ->get(['id', 'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option']);
 
         return Inertia::render('Trivia/Play', [
             'questions' => $questions,
