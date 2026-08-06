@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
-const SECONDS_PER_QUESTION = 10;
+const SECONDS_PER_QUESTION = 20;
 
 export default function Play({ questions, category }) {
     const [currentIndex, setCurrentIndex] = useState(0);

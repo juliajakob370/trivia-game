@@ -26,7 +26,7 @@ Replace the placeholder Home page with a pixel-inspired, muted rose/mauve/plum c
 12. As a player, I want the Mix card to look visually distinct from the regular category cards and sit first in the grid, so that I can recognize it as the special "quick play" option.
 13. As a player, I want clicking a category card to immediately start a Game of 10 questions from that category, so that I can play without extra setup steps.
 14. As a player, when I pick a category with fewer than 10 questions available, I want to play with however many questions exist rather than being blocked, so that thin categories are still playable.
-15. As a player, I want each question to have a ~10 second timer, so that games are fast-paced.
+15. As a player, I want each question to have a ~20 second timer, so that games are fast-paced.
 16. As a player, I want my answer to lock in and the game to advance immediately when I select an option, so that the game rewards fast thinking and my time-per-question is tracked accurately.
 17. As a player, if I don't answer before the timer runs out, I want the question to lock in as unanswered and advance automatically, so that the game keeps moving even if I hesitate.
 18. As a player, I want to only move forward through questions with no way to go back, so that my answers and times reflect one honest, uninterrupted attempt.

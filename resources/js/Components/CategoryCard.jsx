@@ -1,29 +1,40 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 
+const NOTCH = 14;
+const ART_NOTCH = 8;
+
+const pixelClip = (notch) =>
+    `polygon(0% ${notch}px, ${notch}px ${notch}px, ${notch}px 0%, calc(100% - ${notch}px) 0%, calc(100% - ${notch}px) ${notch}px, 100% ${notch}px, 100% calc(100% - ${notch}px), calc(100% - ${notch}px) calc(100% - ${notch}px), calc(100% - ${notch}px) 100%, ${notch}px 100%, ${notch}px calc(100% - ${notch}px), 0% calc(100% - ${notch}px))`;
+
 export default function CategoryCard({ title, slug, icon, accentColor, href, highlightColor }) {
     const [artMissing, setArtMissing] = useState(false);
-    const titleTextClassName = highlightColor ? 'text-plum-dark' : 'text-blush';
+    const [bouncing, setBouncing] = useState(false);
+    const surfaceColor = highlightColor || accentColor;
 
     return (
         <Link
             href={href}
-            style={highlightColor ? { borderColor: highlightColor } : undefined}
-            className={`group block overflow-hidden rounded-lg border-4 bg-blush shadow-md transition-transform duration-150 ease-out hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-mauve ${highlightColor ? '' : 'border-plum-dark'}`}
+            onMouseDown={() => setBouncing(true)}
+            onAnimationEnd={() => setBouncing(false)}
+            className={`group block p-3 shadow-md transition-transform duration-150 ease-out hover:-rotate-1 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-mauve ${bouncing ? 'animate-card-bounce' : ''}`}
+            style={{ backgroundColor: surfaceColor, clipPath: pixelClip(NOTCH) }}
         >
-            <div
-                style={highlightColor ? { backgroundColor: highlightColor } : undefined}
-                className={`flex h-12 items-center justify-center px-2 ${highlightColor ? '' : 'bg-plum-dark'}`}
-            >
+            <div className="relative mb-2 text-center">
                 <span
-                    className={`truncate font-pixel text-[10px] sm:text-xs ${titleTextClassName}`}
+                    aria-hidden="true"
+                    className="absolute inset-0 translate-x-[3px] translate-y-[3px] font-pixel text-xl text-black/40 sm:text-2xl"
                 >
                     {title}
                 </span>
+                <span className="relative font-pixel text-xl leading-relaxed text-blush transition-colors duration-150 group-hover:text-yellow-200 sm:text-2xl">
+                    {title}
+                </span>
             </div>
+
             <div
-                className="flex aspect-[4/3] items-center justify-center text-5xl sm:text-6xl"
-                style={{ backgroundColor: accentColor }}
+                className="flex aspect-[4/3] items-center justify-center bg-blush/90 text-5xl sm:text-6xl"
+                style={{ clipPath: pixelClip(ART_NOTCH) }}
             >
                 {artMissing ? (
                     icon
