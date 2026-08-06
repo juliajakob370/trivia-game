@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/play/{category}', [TriviaController::class, 'index'])->name('trivia.play');
     Route::post('/submit-game', [TriviaController::class, 'store'])->name('trivia.submit');
+    Route::get('/results/{gameResult}', [TriviaController::class, 'results'])->name('trivia.results');
     Route::get('/leaderboard', [TriviaController::class, 'leaderboard'])->name('trivia.leaderboard');
 });
 

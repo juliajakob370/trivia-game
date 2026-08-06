@@ -128,13 +128,50 @@ class TriviaTest extends TestCase
         ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertRedirect(route('trivia.leaderboard'));
 
         $this->assertDatabaseHas('game_results', [
             'user_id' => $user->id,
             'score' => 60,
             'time_taken_seconds' => 55,
         ]);
+
+        $gameResult = GameResult::where('user_id', $user->id)->firstOrFail();
+        $response->assertRedirect(route('trivia.results', $gameResult));
+    }
+
+    public function test_results_page_shows_the_players_score(): void
+    {
+        $user = User::factory()->create();
+        $gameResult = GameResult::create([
+            'user_id' => $user->id,
+            'score' => 70,
+            'time_taken_seconds' => 62,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('trivia.results', $gameResult));
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Trivia/Results')
+            ->where('score', 70)
+            ->where('maxScore', 100)
+            ->where('timeTaken', 62)
+        );
+    }
+
+    public function test_a_player_cannot_view_another_players_results(): void
+    {
+        $owner = User::factory()->create();
+        $gameResult = GameResult::create([
+            'user_id' => $owner->id,
+            'score' => 50,
+            'time_taken_seconds' => 40,
+        ]);
+
+        $response = $this->actingAs(User::factory()->create())
+            ->get(route('trivia.results', $gameResult));
+
+        $response->assertForbidden();
     }
 
     public function test_leaderboard_ranks_by_total_score_across_games_tie_broken_by_average_time(): void

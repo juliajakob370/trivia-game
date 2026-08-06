@@ -82,17 +82,31 @@ class TriviaController extends Controller
             }
         }
 
-        GameResult::create([
+        $gameResult = GameResult::create([
             'user_id' => Auth::id(),
             'score' => $score,
             'time_taken_seconds' => $timeTaken,
         ]);
 
-        return redirect()->route('trivia.leaderboard')->with('success', "Game over! You scored {$score} points!");
+        return redirect()->route('trivia.results', $gameResult);
     }
 
     /**
-     * 3. View Global Leaderboard
+     * 3. View a Single Game's Results
+     */
+    public function results(GameResult $gameResult)
+    {
+        abort_unless($gameResult->user_id === Auth::id(), 403);
+
+        return Inertia::render('Trivia/Results', [
+            'score' => $gameResult->score,
+            'maxScore' => self::QUESTIONS_PER_GAME * self::POINTS_PER_CORRECT_ANSWER,
+            'timeTaken' => $gameResult->time_taken_seconds,
+        ]);
+    }
+
+    /**
+     * 4. View Global Leaderboard
      *
      * Ranked by a player's Total Score summed across every Game they've
      * played, tie-broken by their average time per Game (faster wins).

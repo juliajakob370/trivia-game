@@ -1,10 +1,8 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 export default function Leaderboard({ leaderboard }) {
-    const { flash } = usePage().props;
-
     return (
         <AuthenticatedLayout
             header={
@@ -16,12 +14,6 @@ export default function Leaderboard({ leaderboard }) {
             <Head title="Leaderboard" />
 
             <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-                {flash?.success && (
-                    <div className="mb-6 rounded border-l-4 border-plum bg-rose-light p-4 font-retro text-lg text-plum-dark shadow-sm">
-                        🎉 {flash.success}
-                    </div>
-                )}
-
                 <div className="overflow-hidden rounded-lg border-4 border-plum-dark bg-blush p-6 shadow-md">
                     <div className="mb-6 flex items-center justify-between">
                         <h3 className="font-pixel text-lg text-plum-dark">
