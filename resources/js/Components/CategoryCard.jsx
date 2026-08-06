@@ -9,14 +9,21 @@ const pixelClip = (notch) =>
 
 export default function CategoryCard({ title, slug, icon, accentColor, href, highlightColor }) {
     const [artMissing, setArtMissing] = useState(false);
+    const [gifMissing, setGifMissing] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
     const [bouncing, setBouncing] = useState(false);
     const surfaceColor = highlightColor || accentColor;
+
+    const showGif = isHovering && !gifMissing;
+    const artSrc = `/images/categories/${slug}${showGif ? '.gif' : '.png'}`;
 
     return (
         <Link
             href={href}
             onMouseDown={() => setBouncing(true)}
             onAnimationEnd={() => setBouncing(false)}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
             className={`group block p-3 shadow-md transition-transform duration-150 ease-out hover:-rotate-1 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-mauve ${bouncing ? 'animate-card-bounce' : ''}`}
             style={{ backgroundColor: surfaceColor, clipPath: pixelClip(NOTCH) }}
         >
@@ -40,9 +47,9 @@ export default function CategoryCard({ title, slug, icon, accentColor, href, hig
                     icon
                 ) : (
                     <img
-                        src={`/images/categories/${slug}.png`}
+                        src={artSrc}
                         alt=""
-                        onError={() => setArtMissing(true)}
+                        onError={() => (showGif ? setGifMissing(true) : setArtMissing(true))}
                         className="h-3/4 w-3/4 object-contain"
                         style={{ imageRendering: 'pixelated' }}
                     />

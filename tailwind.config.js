@@ -42,9 +42,17 @@ export default {
                     '60%': { transform: 'scale(0.97) rotate(1deg)' },
                     '100%': { transform: 'scale(1.05) rotate(-1deg)' },
                 },
+                'card-shake': {
+                    '0%, 100%': { transform: 'translateX(0) rotate(0)' },
+                    '20%': { transform: 'translateX(-14px) rotate(-1deg)' },
+                    '40%': { transform: 'translateX(12px) rotate(1deg)' },
+                    '60%': { transform: 'translateX(-8px)' },
+                    '80%': { transform: 'translateX(6px)' },
+                },
             },
             animation: {
                 'card-bounce': 'card-bounce 0.4s ease-out',
+                'card-shake': 'card-shake 0.4s ease-in-out',
             },
         },
     },
