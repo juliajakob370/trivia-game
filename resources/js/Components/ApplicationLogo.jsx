@@ -1,3 +1,5 @@
+// TODO: swap this out for the game's own logo/mascot once those assets exist —
+// this is still Laravel's "L" logomark, just recolored via `fill-current`.
 export default function ApplicationLogo(props) {
     return (
         <svg
