@@ -18,6 +18,7 @@ export default function Home({ categories }) {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <CategoryCard
                         title="Mix"
+                        slug={MIX_SLUG}
                         icon="🔀"
                         accentColor={MIX_ACCENT_COLOR}
                         highlightColor={MIX_ACCENT_COLOR}
@@ -28,6 +29,7 @@ export default function Home({ categories }) {
                         <CategoryCard
                             key={category.id}
                             title={category.name}
+                            slug={category.slug}
                             icon={category.icon}
                             accentColor={category.accent_color}
                             href={route('trivia.play', category.slug)}

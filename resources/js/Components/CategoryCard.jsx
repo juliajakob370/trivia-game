@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 
-export default function CategoryCard({ title, icon, accentColor, href, highlightColor }) {
+export default function CategoryCard({ title, slug, icon, accentColor, href, highlightColor }) {
+    const [artMissing, setArtMissing] = useState(false);
     const titleTextClassName = highlightColor ? 'text-plum-dark' : 'text-blush';
 
     return (
@@ -23,7 +25,17 @@ export default function CategoryCard({ title, icon, accentColor, href, highlight
                 className="flex aspect-[4/3] items-center justify-center text-5xl sm:text-6xl"
                 style={{ backgroundColor: accentColor }}
             >
-                {icon}
+                {artMissing ? (
+                    icon
+                ) : (
+                    <img
+                        src={`/images/categories/${slug}.png`}
+                        alt=""
+                        onError={() => setArtMissing(true)}
+                        className="h-3/4 w-3/4 object-contain"
+                        style={{ imageRendering: 'pixelated' }}
+                    />
+                )}
             </div>
         </Link>
     );
